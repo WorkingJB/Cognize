@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 import { Geist, Azeret_Mono as Geist_Mono } from "next/font/google"
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs"
+import { createServerClient } from "@supabase/ssr"
 import { cookies } from "next/headers"
 import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/toaster"
@@ -26,7 +26,20 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  const supabase = createServerComponentClient({ cookies })
+  const cookieStore = cookies()
+
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get(name: string) {
+          return cookieStore.get(name)?.value
+        },
+      },
+    },
+  )
+
   const {
     data: { session },
   } = await supabase.auth.getSession()
@@ -52,6 +65,3 @@ export default async function RootLayout({
   )
 }
 
-
-
-import './globals.css'

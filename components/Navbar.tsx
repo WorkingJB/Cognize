@@ -1,18 +1,21 @@
 "use client"
 
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { createClient } from "@supabase/supabase-js"
-import { useRouter } from "next/navigation"
+import { createBrowserClient } from "@supabase/ssr"
 
 const Navbar = () => {
   const pathname = usePathname()
   const router = useRouter()
-  const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
+  const supabase = createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+  )
 
   const handleSignOut = async () => {
     await supabase.auth.signOut()
+    router.refresh()
     router.push("/")
   }
 
